@@ -93,7 +93,13 @@ class Client(object):
 
     def droplet_from_id(self, droplet_id):
         url = "droplets/{0}".format(droplet_id)
-        j = self.get(url)
+        try:
+            j = self.get(url)
+        except requests.HTTPError as e:
+            if e.message.startswith('404'):
+                return None
+            else:
+                raise
         if 'droplet' not in j:
             return None
         return Droplet(j['droplet'])

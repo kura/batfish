@@ -23,6 +23,8 @@
 # SOFTWARE.
 
 
+from sys import stdout
+
 import click
 
 from .client import Client
@@ -42,34 +44,101 @@ def authorize(ctx, token):
     print resp
 
 
-@cli.command()
-@click.option('--list', is_flag=True,)
-@click.option('--view', type=int)
-@click.option('--create', is_flag=True)
-@click.option('--delete', type=int)
-@click.pass_obj
-def droplet(ctx, list=True, view=None, create=False, delete=None):
-    if view is not None:
-        droplet_view(ctx, view)
-    elif create is True:
-        droplet_create(ctx)
-    elif delete is not None:
-        droplet_delete(ctx)
+def print_droplet(name, cpu, memory, disk, ip, status, region, did):
+    if status == "active":
+        colour = 'green'
     else:
-        droplet_list(ctx)
+        colour = 'red'
+    click.echo("""{0} [id: {1}] (cpu(s): {2}, mem: {3}MB, disk: {4}, """
+               """ip: {5}, {6}, region: {7})""".format(name, did, cpu, memory,
+               disk, ip, click.style("status: {0}".format(status), fg=colour),
+               region))
+
+@cli.command()
+@click.pass_obj
+def droplets(ctx):
+    for droplet in ctx.droplets():
+        print_droplet(droplet.name, droplet.cpus, droplet.memory,
+                      droplet.disk_size, droplet.networks['ipv4'][0].ip,
+                      droplet.status, droplet.region(ctx).name,
+                      droplet.id)
 
 
-def droplet_list(ctx):
-    ctx.list_droplets()
+@cli.command()
+@click.option('--droplet')
+@click.pass_obj
+def droplet(ctx, droplet):
+    if droplet.isdigit():
+        droplet = ctx.droplet_from_id(droplet)
+    else:
+        droplet = ctx.droplet_from_name(droplet)
+    print_droplet(droplet.name, droplet.cpus, droplet.memory,
+                  droplet.disk_size, droplet.networks['ipv4'][0].ip,
+                  droplet.status, droplet.region(ctx).name,
+                  droplet.id)
 
 
-def droplet_view(ctx, droplet_id):
-    ctx.droplet_from_id(droplet_id)
+@cli.command()
+@click.option('--droplet')
+@click.pass_obj
+def password_reset(ctx, droplet):
+    if droplet.isdigit():
+        droplet = ctx.droplet_from_id(droplet)
+    else:
+        droplet = ctx.droplet_from_name(droplet)
+    ctx.droplet('password_reset', droplet)
 
 
-def droplet_create(ctx):
-    pass
+@cli.command()
+@click.option('--droplet')
+@click.pass_obj
+def power_cycle(ctx, droplet):
+    if droplet.isdigit():
+        droplet = ctx.droplet_from_id(droplet)
+    else:
+        droplet = ctx.droplet_from_name(droplet)
+    ctx.droplet('power_cycle', droplet)
 
 
-def droplet_delete(ctx, droplet_id):
-    pass
+@cli.command()
+@click.option('--droplet')
+@click.pass_obj
+def power_off(ctx, droplet):
+    if droplet.isdigit():
+        droplet = ctx.droplet_from_id(droplet)
+    else:
+        droplet = ctx.droplet_from_name(droplet)
+    ctx.droplet('power_off', droplet)
+
+
+@cli.command()
+@click.option('--droplet')
+@click.pass_obj
+def power_on(ctx, droplet):
+    if droplet.isdigit():
+        droplet = ctx.droplet_from_id(droplet)
+    else:
+        droplet = ctx.droplet_from_name(droplet)
+    ctx.droplet('power_on', droplet)
+
+
+@cli.command()
+@click.option('--droplet')
+@click.pass_obj
+def reboot(ctx, droplet):
+    if droplet.isdigit():
+        droplet = ctx.droplet_from_id(droplet)
+    else:
+        droplet = ctx.droplet_from_name(droplet)
+    ctx.droplet('reboot', droplet)
+
+
+@cli.command()
+@click.option('--droplet')
+@click.pass_obj
+def shutdown(ctx, droplet):
+    if droplet.isdigit():
+        droplet = ctx.droplet_from_id(droplet)
+    else:
+        droplet = ctx.droplet_from_name(droplet)
+    ctx.droplet('shutdown', droplet)

@@ -57,7 +57,7 @@ class Droplet(object):
 
     @property
     def disk_size(self):
-        return self._data['disk']
+        return "{0}GB".format(self._data['disk'])
 
     def region(self, client):
         return client.region_from_slug(self._data['region']['slug'])

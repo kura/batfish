@@ -29,4 +29,4 @@ from .image import Image
 from .region import Region
 
 
-__all__ = ['Action', 'Droplet', 'Image', 'Region']
+__all__ = ['Action', 'Droplet', 'Image', 'Region', ]
