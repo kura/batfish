@@ -29,3 +29,8 @@ __url__ = "https://batfish.readthedocs.org/"
 __author__ = "Kura"
 __email__ = "kura@kura.io"
 __license__ = "MIT"
+
+
+from .client import Client
+
+__all__ = ['Client', ]

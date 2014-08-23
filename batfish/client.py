@@ -28,6 +28,7 @@ import os
 
 import requests
 
+from batfish import __title__, __version__
 from .models import Droplet, Image, Region
 
 
@@ -55,8 +56,19 @@ class Client(object):
     def get(self, url, headers=None):
         if headers is None:
             headers = {'Authorization': "Bearer {0}".format(self.token)}
+        headers['User-Agent'] = "{0} ({1})".format(__title__.title(),
+                                                   __version__)
         r = requests.get("{0}{1}".format(self.api_base, url), headers=headers)
         r.raise_for_status()
+        return json.loads(r.text)
+
+    def post(self, url, payload):
+        headers = {'Authorization': "Bearer {0}".format(self.token),
+                   'User-Agent': "{0} ({1})".format(__title__,
+                                                    __version__),
+                   'Content-Type': "application/json"}
+        r = requests.post("{0}{1}".format(self.api_base, url),
+                          headers=headers, data=json.dumps(payload))
         return json.loads(r.text)
 
     def authorize(self, token):
@@ -94,6 +106,15 @@ class Client(object):
             if d['name'].startswith(name):
                 return Droplet(d)
         return None
+
+    def droplet(self, action, droplet):
+        if action not in ['reboot', 'power_cycle', 'shutdown', 'power_off',
+                          'power_on', 'password_reset']:
+            raise NotImplemented(action)
+        if isinstance(droplet, Droplet):
+            droplet = droplet.id
+        print self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': action})
 
     def images(self):
         j = self.get('images')
