@@ -113,6 +113,6 @@ class Client(object):
     def region_from_slug(self, slug):
         j = self.get('regions')
         for r in j['regions']:
-            if r['name'].startswith(slug):
+            if r['slug'].startswith(slug):
                 return Region(r)
         return None

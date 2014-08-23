@@ -2,86 +2,6 @@ from collections import namedtuple
 from datetime import datetime
 
 
-DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-
-
-class Action(object):
-    _data = None
-
-    def __init__(self, action_data):
-        self._data = action_data
-
-    def __str__(self):
-        return self.__repr__()
-
-    def __repr__(self):
-        return "<Action {0}>".format(self.type)
-
-    @property
-    def id(self):
-        return self._data['id']
-
-    @property
-    def status(self):
-        return self._data['status']
-
-    @property
-    def type(self):
-        return self._data['type']
-
-    @property
-    def started(self):
-        return datetime.strptime(self._data['started_at'], DATE_FORMAT)
-
-    @property
-    def completed(self):
-        return datetime.strptime(self._data['completed_at'], DATE_FORMAT)
-
-    @property
-    def resource_id(self):
-        return self._data['resource_id']
-
-    @property
-    def resource_type(self):
-        return self._data['resource_type']
-
-    def region(self, client):
-        return self.from_from_slug(self._data['region']['slug'])
-
-
-class Region(object):
-    _data = None
-
-    def __init__(self, region_data):
-        self._data = region_data
-
-    def __str__(self):
-        return self.__repr__()
-
-    def __repr__(self):
-        return "<Region {0}>".format(self.name)
-
-    @property
-    def slug(self):
-        return self._data['slug']
-
-    @property
-    def name(self):
-        return self._data['name']
-
-    @property
-    def sizes(self):
-        return self._data['sizes']
-
-    @property
-    def available(self):
-        return self._data['available']
-
-    @property
-    def features(self):
-        return self._data['features']
-
-
 class Droplet(object):
     _data = None
 
@@ -115,7 +35,7 @@ class Droplet(object):
         return self._data['disk']
 
     def region(self, client):
-        return self.from_from_slug(self._data['region']['slug'])
+        return client.region_from_slug(self._data['region']['slug'])
 
     def image(self, client):
         return client.image_from_id(self._data['image']['id'])
@@ -135,7 +55,7 @@ class Droplet(object):
 
     @property
     def created(self):
-        return datetime.strptime(self._data['created_at'], DATE_FORMAT)
+        return datetime.strptime(self._data['created_at'], '%Y-%m-%dT%H:%M:%SZ')
 
     @property
     def status(self):
@@ -178,49 +98,3 @@ class Droplet(object):
     @property
     def features(self):
         return self._data['features']
-
-
-class Image(object):
-    _data = None
-
-    def __init__(self, image_data):
-        self._data = image_data
-
-    def __str__(self):
-        return self.__repr__()
-
-    def __repr__(self):
-        return "<Image {}>".format(self.name)
-
-    @property
-    def id(self):
-        return self._data['id']
-
-    @property
-    def name(self):
-        return self._data['name']
-
-    @property
-    def distribution(self):
-        return self._data['distribution']
-
-    @property
-    def slug(self):
-        return self._data['slug']
-
-    @property
-    def public(self):
-        return self._data['public']
-
-    def regions(self, client):
-        return [client.region_from_slug(r['slug'] for r in self._data['region'])]
-
-    def actions(self, client):
-        j = client.get("images/{0}/actions".format(self.id))
-        if 'actions' not in j:
-            return None
-        return [Action(a) for a in j['actions']]
-
-    @property
-    def created(self):
-        return datetime.strptime(self._data['created_at'], DATE_FORMAT)
