@@ -65,7 +65,7 @@ def droplets(ctx):
 
 
 @cli.command()
-@click.option('--droplet')
+@click.option('--droplet', help="Droplet name or ID")
 @click.pass_obj
 def droplet(ctx, droplet):
     if droplet.isdigit():
@@ -79,9 +79,13 @@ def droplet(ctx, droplet):
 
 
 @cli.command()
-@click.option('--droplet')
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
 @click.pass_obj
-def password_reset(ctx, droplet):
+def password_reset(ctx, droplet, accept):
+    if accept is False:
+        return
     if droplet.isdigit():
         droplet = ctx.droplet_from_id(droplet)
     else:
@@ -90,9 +94,13 @@ def password_reset(ctx, droplet):
 
 
 @cli.command()
-@click.option('--droplet')
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
 @click.pass_obj
-def power_cycle(ctx, droplet):
+def power_cycle(ctx, droplet, accept):
+    if accept is False:
+        return
     if droplet.isdigit():
         droplet = ctx.droplet_from_id(droplet)
     else:
@@ -101,9 +109,13 @@ def power_cycle(ctx, droplet):
 
 
 @cli.command()
-@click.option('--droplet')
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
 @click.pass_obj
-def power_off(ctx, droplet):
+def power_off(ctx, droplet, accept):
+    if accept is False:
+        return
     if droplet.isdigit():
         droplet = ctx.droplet_from_id(droplet)
     else:
@@ -112,7 +124,7 @@ def power_off(ctx, droplet):
 
 
 @cli.command()
-@click.option('--droplet')
+@click.option('--droplet', help="Droplet name or ID")
 @click.pass_obj
 def power_on(ctx, droplet):
     if droplet.isdigit():
@@ -123,9 +135,13 @@ def power_on(ctx, droplet):
 
 
 @cli.command()
-@click.option('--droplet')
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
 @click.pass_obj
-def reboot(ctx, droplet):
+def reboot(ctx, droplet, accept):
+    if accept is False:
+        return
     if droplet.isdigit():
         droplet = ctx.droplet_from_id(droplet)
     else:
@@ -134,9 +150,13 @@ def reboot(ctx, droplet):
 
 
 @cli.command()
-@click.option('--droplet')
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
 @click.pass_obj
-def shutdown(ctx, droplet):
+def shutdown(ctx, droplet, accept):
+    if accept is False:
+        return
     if droplet.isdigit():
         droplet = ctx.droplet_from_id(droplet)
     else:
