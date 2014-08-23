@@ -1,5 +1,3 @@
-import os
-
 import click
 
 from .client import Client
@@ -18,15 +16,35 @@ def authorize(ctx, token):
     resp = ctx.authorize(token)
     print resp
 
+
 @cli.command()
-@click.option('--list', 'action', flag_value='list', default=True)
-@click.option('--create', 'action', flag_value='create', default=False)
-@click.option('--delete', 'action', flag_value='delete', default=False)
+@click.option('--list', is_flag=True,)
+@click.option('--view', type=int)
+@click.option('--create', is_flag=True)
+@click.option('--delete', type=int)
 @click.pass_obj
-def droplet(ctx, action):
-    if action == 'create':
-        NotImplemented()
-    if action == 'delete':
-        NotImplemented()
+def droplet(ctx, list=True, view=None, create=False, delete=None):
+    if view is not None:
+        droplet_view(ctx, view)
+    elif create is True:
+        droplet_create(ctx)
+    elif delete is not None:
+        droplet_delete(ctx)
     else:
-        ctx.droplet_list()
+        droplet_list(ctx)
+
+
+def droplet_list(ctx):
+    ctx.list_droplets()
+
+
+def droplet_view(ctx, droplet_id):
+    ctx.droplet_from_id(droplet_id)
+
+
+def droplet_create(ctx):
+    pass
+
+
+def droplet_delete(ctx, droplet_id):
+    pass

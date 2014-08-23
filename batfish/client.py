@@ -1,6 +1,9 @@
+import json
 import os
 
 import requests
+
+from .models import Droplet
 
 
 def read_token_from_conf():
@@ -44,6 +47,22 @@ class Client(object):
                    """Server responded with {0} - {1}""".format(r.status_code,
                                                                 r.reason)
 
-    def droplet_list(self):
+    def list_droplets(self):
         r = self.get('droplets')
-        print r.text
+        j = json.loads(r.text)
+        return [Droplet(d) for d in j['droplets']]
+
+
+    def droplet_from_id(self, droplet_id):
+        url = "droplets/{0}".format(droplet_id)
+        r = self.get(url)
+        j = json.loads(r.text)
+        return Droplet(j['droplet'])
+
+    def droplet_from_name(self, droplet_name):
+        r = self.get('droplets')
+        j = json.loads(r.text)
+        for d in j['droplets']:
+            if d['name'].startswith(droplet_name):
+                return Droplet(d)
+        return None
