@@ -3,7 +3,7 @@ import os
 
 import requests
 
-from .models import Droplet
+from .models import Droplet, Image, Region
 
 
 def read_token_from_conf():
@@ -31,7 +31,8 @@ class Client(object):
         if headers is None:
             headers = {'Authorization': "Bearer {0}".format(self.token)}
         r = requests.get("{0}{1}".format(self.api_base, url), headers=headers)
-        return r
+        r.raise_for_status()
+        return json.loads(r.text)
 
     def authorize(self, token):
         h = {'Authorization': "Bearer {0}".format(token)}
@@ -47,22 +48,71 @@ class Client(object):
                    """Server responded with {0} - {1}""".format(r.status_code,
                                                                 r.reason)
 
-    def list_droplets(self):
-        r = self.get('droplets')
-        j = json.loads(r.text)
+    def droplets(self):
+        j = self.get('droplets')
+        if 'droplets' not in j:
+            return None
         return [Droplet(d) for d in j['droplets']]
-
 
     def droplet_from_id(self, droplet_id):
         url = "droplets/{0}".format(droplet_id)
-        r = self.get(url)
-        j = json.loads(r.text)
+        j = self.get(url)
+        if 'droplet' not in j:
+            return None
         return Droplet(j['droplet'])
 
-    def droplet_from_name(self, droplet_name):
-        r = self.get('droplets')
-        j = json.loads(r.text)
+    def droplet_from_name(self, name):
+        j = self.get('droplets')
+        if 'droplets' not in j:
+            return None
         for d in j['droplets']:
-            if d['name'].startswith(droplet_name):
+            if d['name'].startswith(name):
                 return Droplet(d)
+        return None
+
+    def images(self):
+        j = self.get('images')
+        if 'images' not in j:
+            return None
+        return [Image(i) for i in j['images']]
+
+    def image_from_id(self, image_id):
+        url = "images/{0}".format(image_id)
+        j = self.get(url)
+        if 'image' not in j:
+            return None
+        return Image(j['image'])
+
+    def image_from_name(self, name):
+        j = self.get('images')
+        if 'images' not in j:
+            return None
+        for i in j['images']:
+            if i['name'].startswith(name):
+                return Image(i)
+        return None
+
+    def image_from_slug(self, slug):
+        url = "images/{0}".format(slug)
+        j = self.get(url)
+        if 'image' not in j:
+            return None
+        return Image(j['image'])
+
+    def regions(self):
+        j = self.get('regions')
+        return [Region(r) for r in j['regions']]
+
+    def region_from_name(self, name):
+        j = self.get('regions')
+        for r in j['regions']:
+            if r['name'].startswith(name):
+                return Region(r)
+        return None
+
+    def region_from_slug(self, slug):
+        j = self.get('regions')
+        for r in j['regions']:
+            if r['name'].startswith(slug):
+                return Region(r)
         return None
