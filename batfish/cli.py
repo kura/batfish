@@ -1,17 +1,32 @@
+import os
+
 import click
+
+from .client import Client
 
 
 @click.group()
 @click.pass_context
 def cli(ctx):
-    pass
+    ctx.obj = Client()
 
 
-@click.command()
+@cli.command()
 @click.option('--token', prompt="Token")
-def authorize(token):
-    print token
+@click.pass_obj
+def authorize(ctx, token):
+    resp = ctx.authorize(token)
+    print resp
 
-
-if __name__ == '__main__':
-    cli()
+@cli.command()
+@click.option('--list', 'action', flag_value='list', default=True)
+@click.option('--create', 'action', flag_value='create', default=False)
+@click.option('--delete', 'action', flag_value='delete', default=False)
+@click.pass_obj
+def droplet(ctx, action):
+    if action == 'create':
+        NotImplemented()
+    if action == 'delete':
+        NotImplemented()
+    else:
+        ctx.droplet_list()

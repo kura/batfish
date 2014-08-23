@@ -9,6 +9,12 @@ long_desc = re.sub(r":[a-z]*:`", "`", long_desc)
 
 exec(open('batfish/__init__.py').read())
 
+entry_points = {
+    'console_scripts': [
+        'batfish = batfish.cli:cli',
+    ]
+}
+
 setup(name=__title__,
       version=__version__,
       url=__url__,
@@ -25,6 +31,7 @@ setup(name=__title__,
       requires=['requests', ],
       provides=[__title__, ],
       keywords=['digital', 'ocean', 'shell', 'cli'],
+      entry_points=entry_points,
       classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
