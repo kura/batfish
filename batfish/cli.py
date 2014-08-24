@@ -27,6 +27,7 @@ import click
 
 from .client import Client
 from .models.region import Region
+from .models.size import Size
 
 
 @click.group()
@@ -175,7 +176,7 @@ def restore(ctx, droplet, accept):
         if image is None:
             image = ctx.image_from_slug(image)
         image = image.id
-    ctx.droplet('restore', droplet, image)
+    ctx.droplet('restore', droplet, image=image)
 
 
 @cli.command()
@@ -196,18 +197,42 @@ def rebuild(ctx, droplet, accept):
         if image is None:
             image = ctx.image_from_slug(image)
         image = image.id
-    ctx.droplet('rebuild', droplet, image)
+    ctx.droplet('rebuild', droplet, image=image)
 
 
 @cli.command()
 @click.option('--name', help="Droplet name")
 @click.option('--region', type=click.Choice(sorted(Region.mapping.keys())))
-@click.option('--size')
+@click.option('--size', type=click.Choice(Size.mapping))
 @click.option('--image', help="Image name, slug or ID")
 @click.pass_obj
 def create(ctx, name, region, size, image):
-    print name
-    print region
+    ctx.create_droplet(name, region, size, image)
+
+
+@cli.command()
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--name', help="New droplet name")
+@click.pass_obj
+def rename_droplet(ctx, droplet, name):
+    if not droplet.isdigit():
+        droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
+    ctx.droplet('rename', droplet, name=name)
+
+
+@cli.command()
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
+@click.pass_obj
+def delete_droplet(ctx, droplet, accept):
+    if accept is False:
+        return
+    if not droplet.isdigit():
+        droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
+    ctx.delete_droplet(droplet)
 
 
 def print_image(iid, name, slug, distribution, regions):
@@ -237,3 +262,24 @@ def image(ctx, image):
             image = ctx.image_from_slug(image)
     print_image(image.id, image.name, image.slug, image.distribution,
                 image.region_names)
+
+
+def print_size(name, cpus, disk_size, price, regions):
+    click.echo("""{0} (cpu(s): {1}, memory: {0}, disk: {2}) """
+               """(price: {3}/hour {4}/month) regions: [{5}]""".format(name,
+               cpus, disk_size, price.hourly, price.monthly,
+               ", ".join(regions)))
+
+
+@cli.command()
+@click.option('--detailed', is_flag=True, default=False,
+              help="Displays a detailed view of sizes")
+@click.pass_obj
+def sizes(ctx, detailed):
+    if not detailed:
+        for size in Size.mappings():
+            click.echo(size)
+        return
+    for size in ctx.sizes():
+        print_size(size.slug.upper(), size.cpus, size.disk_size, size.price,
+                   size.region_names)

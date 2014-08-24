@@ -30,6 +30,8 @@ from .region import Region
 
 class Size(object):
     _data = None
+    mapping = ('512MB', '1GB', '2GB', '4GB', '8GB', '16GB', '32GB',
+               '48GB', '64GB')
 
     def __init__(self, size_data):
         self._data = size_data
@@ -39,6 +41,10 @@ class Size(object):
 
     def __repr__(self):
         return "<Size {0}>".format(self.slug.upper())
+
+    @staticmethod
+    def mappings():
+        return Size.mapping
 
     @property
     def slug(self):

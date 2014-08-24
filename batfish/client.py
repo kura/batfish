@@ -25,11 +25,15 @@
 
 import json
 import os
+import re
 
 import requests
 
 from batfish import __title__, __version__
 from .models import Droplet, Image, Region, Size
+
+
+hostname_valid_chars = re.compile(r"^[a-zA-Z0-9\.\-]*$")
 
 
 def read_token_from_conf():
@@ -70,6 +74,13 @@ class Client(object):
         r = requests.post("{0}{1}".format(self.api_base, url),
                           headers=headers, data=json.dumps(payload))
         return json.loads(r.text)
+
+    def delete(self, url):
+        headers = {'Authorization': "Bearer {0}".format(self.token),
+                   'User-Agent': "{0} ({1})".format(__title__,
+                                                    __version__)}
+        r = requests.delete("{0}{1}".format(self.api_base, url),
+                            headers=headers)
 
     def authorize(self, token):
         h = {'Authorization': "Bearer {0}".format(token)}
@@ -130,8 +141,32 @@ class Client(object):
         if action in ['rename', ]:
             if name is None:
                 raise KeyError("No new name provided")
+            if not hostname_valid_chars.match(name):
+                raise ValueError("""Valid characters are allowed. """
+                                 """(a-z, A-Z, 0-9, . and -)""")
             d['name'] = name
         print self.post('droplets/{0}/actions'.format(droplet), d)
+
+    def delete_droplet(self, droplet):
+        if isinstance(droplet, Droplet):
+            droplet = droplet.id
+        print self.delete('droplets/{0}'.format(droplet))
+
+    def create_droplet(self, name, region, size, image):
+        if isinstance(size, Size):
+            size = size.name
+        if isinstance(image, Image):
+            image = image.id
+        if isinstance(region, Region):
+            region = region.slug
+        if not image.isdigit():
+            image = image.lower()
+        if not hostname_valid_chars.match(name):
+            raise ValueError("""Valid characters are allowed. """
+                             """(a-z, A-Z, 0-9, . and -)""")
+        d = {'name': name, 'size': size.lower(), 'image': image,
+             'region': region}
+        print self.post('droplets', d)
 
     def images(self):
         j = self.get('images')
