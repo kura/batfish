@@ -25,6 +25,10 @@
 
 class Region(object):
     _data = None
+    mapping = {'ams1': 'Amsterdam 1', 'ams2': 'Amsterdam 2',
+               'lon1': 'London 1', 'nyc1': 'New York 1',
+               'nyc2': 'New York 2', 'nyc3': 'New York 3',
+               'sfo1': 'San Fancisco 1', 'sgp1': 'Singapore 1'}
 
     def __init__(self, region_data):
         self._data = region_data
@@ -34,6 +38,13 @@ class Region(object):
 
     def __repr__(self):
         return "<Region {0}>".format(self.name)
+
+    @staticmethod
+    def name_from_slug(slug):
+        if slug not in Region.mapping:
+            return "Unknown"
+        else:
+            return Region.mapping[slug]
 
     @property
     def slug(self):

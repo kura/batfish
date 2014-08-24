@@ -27,6 +27,7 @@ from .action import Action
 from .droplet import Droplet
 from .image import Image
 from .region import Region
+from .size import Size
 
 
-__all__ = ['Action', 'Droplet', 'Image', 'Region', ]
+__all__ = ['Action', 'Droplet', 'Image', 'Region', 'Size']

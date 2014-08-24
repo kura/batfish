@@ -23,11 +23,10 @@
 # SOFTWARE.
 
 
-from sys import stdout
-
 import click
 
 from .client import Client
+from .models.region import Region
 
 
 @click.group()
@@ -60,7 +59,7 @@ def droplets(ctx):
     for droplet in ctx.droplets():
         print_droplet(droplet.name, droplet.cpus, droplet.memory,
                       droplet.disk_size, droplet.networks['ipv4'][0].ip,
-                      droplet.status, droplet.region(ctx).name,
+                      droplet.status, droplet.region_name,
                       droplet.id)
 
 
@@ -74,7 +73,7 @@ def droplet(ctx, droplet):
         droplet = ctx.droplet_from_name(droplet)
     print_droplet(droplet.name, droplet.cpus, droplet.memory,
                   droplet.disk_size, droplet.networks['ipv4'][0].ip,
-                  droplet.status, droplet.region(ctx).name,
+                  droplet.status, droplet.region_name,
                   droplet.id)
 
 
@@ -86,10 +85,9 @@ def droplet(ctx, droplet):
 def password_reset(ctx, droplet, accept):
     if accept is False:
         return
-    if droplet.isdigit():
-        droplet = ctx.droplet_from_id(droplet)
-    else:
+    if not droplet.isdigit():
         droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
     ctx.droplet('password_reset', droplet)
 
 
@@ -101,10 +99,9 @@ def password_reset(ctx, droplet, accept):
 def power_cycle(ctx, droplet, accept):
     if accept is False:
         return
-    if droplet.isdigit():
-        droplet = ctx.droplet_from_id(droplet)
-    else:
+    if not droplet.isdigit():
         droplet = ctx.droplet_from_name(droplet)
+        droplet = dtoplet.id
     ctx.droplet('power_cycle', droplet)
 
 
@@ -116,10 +113,9 @@ def power_cycle(ctx, droplet, accept):
 def power_off(ctx, droplet, accept):
     if accept is False:
         return
-    if droplet.isdigit():
-        droplet = ctx.droplet_from_id(droplet)
-    else:
+    if not droplet.isdigit():
         droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
     ctx.droplet('power_off', droplet)
 
 
@@ -127,10 +123,9 @@ def power_off(ctx, droplet, accept):
 @click.option('--droplet', help="Droplet name or ID")
 @click.pass_obj
 def power_on(ctx, droplet):
-    if droplet.isdigit():
-        droplet = ctx.droplet_from_id(droplet)
-    else:
+    if not droplet.isdigit():
         droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
     ctx.droplet('power_on', droplet)
 
 
@@ -142,10 +137,9 @@ def power_on(ctx, droplet):
 def reboot(ctx, droplet, accept):
     if accept is False:
         return
-    if droplet.isdigit():
-        droplet = ctx.droplet_from_id(droplet)
-    else:
+    if not droplet.isdigit():
         droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
     ctx.droplet('reboot', droplet)
 
 
@@ -157,8 +151,89 @@ def reboot(ctx, droplet, accept):
 def shutdown(ctx, droplet, accept):
     if accept is False:
         return
-    if droplet.isdigit():
-        droplet = ctx.droplet_from_id(droplet)
-    else:
+    if not droplet.isdigit():
         droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
     ctx.droplet('shutdown', droplet)
+
+
+@cli.command()
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--image', help="Droplet name, slug or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
+@click.pass_obj
+def restore(ctx, droplet, accept):
+    if accept is False:
+        return
+    if not droplet.isdigit():
+        droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
+    if not image.isdigit():
+        # assume name first, then try slug
+        image = ctx.image_from_name(image)
+        if image is None:
+            image = ctx.image_from_slug(image)
+        image = image.id
+    ctx.droplet('restore', droplet, image)
+
+
+@cli.command()
+@click.option('--droplet', help="Droplet name or ID")
+@click.option('--image', help="Droplet name, slug or ID")
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
+@click.pass_obj
+def rebuild(ctx, droplet, accept):
+    if accept is False:
+        return
+    if not droplet.isdigit():
+        droplet = ctx.droplet_from_name(droplet)
+        droplet = droplet.id
+    if not image.isdigit():
+        # assume name first, then try slug
+        image = ctx.image_from_name(image)
+        if image is None:
+            image = ctx.image_from_slug(image)
+        image = image.id
+    ctx.droplet('rebuild', droplet, image)
+
+
+@cli.command()
+@click.option('--name', help="Droplet name")
+@click.option('--region', type=click.Choice(sorted(Region.mapping.keys())))
+@click.option('--size')
+@click.option('--image', help="Image name, slug or ID")
+@click.pass_obj
+def create(ctx, name, region, size, image):
+    print name
+    print region
+
+
+def print_image(iid, name, slug, distribution, regions):
+    click.echo("""{0} [id: {1}] (slug: {2}, distribution: {3}, """
+               """regions: [{4}])""".format(name, iid, slug,
+               distribution, ", ".join(regions)))
+
+
+@cli.command()
+@click.pass_obj
+def images(ctx):
+    for image in ctx.images():
+        print_image(image.id, image.name, image.slug, image.distribution,
+                    image.region_names)
+
+
+@cli.command()
+@click.option('--images', help="Image name, slug or ID")
+@click.pass_obj
+def image(ctx, image):
+    if image.isdigit():
+        image = ctx.image_from_id(image)
+    else:
+        # assume name first, then try slug
+        image = ctx.image_from_name(image)
+        if image is None:
+            image = ctx.image_from_slug(image)
+    print_image(image.id, image.name, image.slug, image.distribution,
+                image.region_names)

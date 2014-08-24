@@ -26,6 +26,8 @@
 from collections import namedtuple
 from datetime import datetime
 
+from .region import Region
+
 
 class Droplet(object):
     _data = None
@@ -58,6 +60,10 @@ class Droplet(object):
     @property
     def disk_size(self):
         return "{0}GB".format(self._data['disk'])
+
+    @property
+    def region_name(self):
+        return Region.name_from_slug(self._data['region']['slug'])
 
     def region(self, client):
         return client.region_from_slug(self._data['region']['slug'])

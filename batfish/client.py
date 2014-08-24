@@ -29,7 +29,7 @@ import os
 import requests
 
 from batfish import __title__, __version__
-from .models import Droplet, Image, Region
+from .models import Droplet, Image, Region, Size
 
 
 def read_token_from_conf():
@@ -109,18 +109,29 @@ class Client(object):
         if 'droplets' not in j:
             return None
         for d in j['droplets']:
-            if d['name'].startswith(name):
+            if d['name'].lower().startswith(name.lower()):
                 return Droplet(d)
         return None
 
-    def droplet(self, action, droplet):
-        if action not in ['reboot', 'power_cycle', 'shutdown', 'power_off',
-                          'power_on', 'password_reset']:
-            raise NotImplemented(action)
+    def droplet(self, action, droplet, image=None, name=None):
+        if action not in ['reboot', 'resize', 'power_cycle', 'power_off',
+                          'power_on', 'password_reset', 'shutdown', 'restore',
+                          'rebuild', 'snapshot', 'rename']:
+            raise NotImplemented("Invalid action")
         if isinstance(droplet, Droplet):
             droplet = droplet.id
-        print self.post('droplets/{0}/actions'.format(droplet),
-                        {'type': action})
+        d = {'type': action}
+        if action in ['restore', 'rebuild']:
+            if image is None:
+                raise KeyError("No image provided")
+            if isinstance(image, Image):
+                image = image.id
+            d['image'] = image
+        if action in ['rename', ]:
+            if name is None:
+                raise KeyError("No new name provided")
+            d['name'] = name
+        print self.post('droplets/{0}/actions'.format(droplet), d)
 
     def images(self):
         j = self.get('images')
@@ -140,12 +151,12 @@ class Client(object):
         if 'images' not in j:
             return None
         for i in j['images']:
-            if i['name'].startswith(name):
+            if i['name'].lower().startswith(name.lower()):
                 return Image(i)
         return None
 
     def image_from_slug(self, slug):
-        url = "images/{0}".format(slug)
+        url = "images/{0}".format(slug.lower())
         j = self.get(url)
         if 'image' not in j:
             return None
@@ -158,13 +169,24 @@ class Client(object):
     def region_from_name(self, name):
         j = self.get('regions')
         for r in j['regions']:
-            if r['name'].startswith(name):
+            if r['name'].lower().startswith(name.lower()):
                 return Region(r)
         return None
 
     def region_from_slug(self, slug):
         j = self.get('regions')
         for r in j['regions']:
-            if r['slug'].startswith(slug):
+            if r['slug'].lower().startswith(slug.lower()):
                 return Region(r)
+        return None
+
+    def sizes(self):
+        j = self.get('sizes')
+        return [Size(s) for s in j['sizes']]
+
+    def size_from_slug(self, slug):
+        j = self.get('sizes')
+        for s in j['sizes']:
+            if s['slug'].lower().startswith(slug.lower()):
+                return Size(s)
         return None
