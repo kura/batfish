@@ -124,37 +124,93 @@ class Client(object):
                 return Droplet(d)
         return None
 
-    def droplet(self, action, droplet, image=None, name=None):
-        if action not in ['reboot', 'resize', 'power_cycle', 'power_off',
-                          'power_on', 'password_reset', 'shutdown', 'restore',
-                          'rebuild', 'snapshot', 'rename']:
-            raise NotImplemented("Invalid action")
+    def simple_droplet_image_action(self, action, droplet, image):
+        if action not in ['restore', 'rebuild', ]:
+            raise NotImplemented()
         if isinstance(droplet, Droplet):
             droplet = droplet.id
-        d = {'type': action}
-        if action in ['restore', 'rebuild']:
-            if image is None:
-                raise KeyError("No image provided")
-            if isinstance(image, Image):
-                image = image.id
-            d['image'] = image
-        if action in ['rename', ]:
-            if name is None:
-                raise KeyError("No new name provided")
-            if not hostname_valid_chars.match(name):
-                raise ValueError("""Valid characters are allowed. """
-                                 """(a-z, A-Z, 0-9, . and -)""")
-            d['name'] = name
-        print self.post('droplets/{0}/actions'.format(droplet), d)
+        if isinstance(image, Image):
+            image = image.id
+        print self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': action, 'image': image})
 
-    def delete_droplet(self, droplet):
+    def simple_droplet_action(self, action, droplet):
+        if action not in ['reboot', 'power_cycle', 'power_off', 'enable_ipv6',
+                          'power_on', 'password_reset', 'shutdown',
+                          'disable_backups', 'enable_private_networking', ]:
+            raise NotImplemented()
+        if isinstance(droplet, Droplet):
+            droplet = droplet.id
+        print self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': action})
+
+    def droplet_rename(self, droplet, name):
+        if isinstance(droplet, Droplet):
+            droplet = droplet.id
+        if not hostname_valid_chars.match(name):
+            raise ValueError("""Only valid characters are allowed. """
+                             """(a-z, A-Z, 0-9, . and -)""")
+        print self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': 'rename', 'name': name})
+
+    def droplet_snapshot(self, droplet, name):
+        if isinstance(droplet, Droplet):
+            droplet = droplet.id
+        if not hostname_valid_chars.match(name):
+            raise ValueError("""Only valid characters are allowed. """
+                             """(a-z, A-Z, 0-9, . and -)""")
+        print self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': 'snapshot', 'name': name})
+
+    def droplet_resize(self, droplet, size):
+        if isinstance(droplet, Droplet):
+            droplet = droplet.id
+        if isinstance(size, Size):
+            size = size.slug
+        print self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': 'resize', 'size': size})
+
+    def droplet_restore(self, droplet, image):
+        self.simple_droplet_image_action('restore', droplet, image)
+
+    def droplet_rebuild(self, droplet, image):
+        self.simple_droplet_image_action('rebuild', droplet, image)
+
+    def droplet_enable_ipv6(self, droplet):
+        self.simple_droplet_action('enable_ipv6', droplet)
+
+    def droplet_disable_backups(self, droplet):
+        self.simple_droplet_action('disable_backups', droplet)
+
+    def droplet_enable_private_networking(self, droplet):
+        self.simple_droplet_action('enable_private_networking', droplet)
+
+    def droplet_reboot(self, droplet):
+        self.simple_droplet_action('reboot', droplet)
+
+    def droplet_power_cycle(self, droplet):
+        self.simple_droplet_action('power_cycle', droplet)
+
+    def droplet_power_off(self, droplet):
+        self.simple_droplet_action('power_off', droplet)
+
+    def droplet_power_on(self, droplet):
+        self.simple_droplet_action('power_on', droplet)
+
+    def droplet_password_reset(self, droplet):
+        self.simple_droplet_action('password_reset', droplet)
+
+    def droplet_shutdown(self, droplet):
+        self.simple_droplet_action('shutdown', droplet)
+
+    def droplet_delete(self, droplet):
         if isinstance(droplet, Droplet):
             droplet = droplet.id
         print self.delete('droplets/{0}'.format(droplet))
 
-    def create_droplet(self, name, region, size, image):
+    def droplet_create(self, name, region, size, image):
         if isinstance(size, Size):
-            size = size.name
+            size = size.slug
         if isinstance(image, Image):
             image = image.id
         if isinstance(region, Region):
@@ -162,7 +218,7 @@ class Client(object):
         if not image.isdigit():
             image = image.lower()
         if not hostname_valid_chars.match(name):
-            raise ValueError("""Valid characters are allowed. """
+            raise ValueError("""Only valid characters are allowed. """
                              """(a-z, A-Z, 0-9, . and -)""")
         d = {'name': name, 'size': size.lower(), 'image': image,
              'region': region}

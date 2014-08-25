@@ -40,6 +40,10 @@ class Region(object):
         return "<Region {0}>".format(self.name)
 
     @staticmethod
+    def mappings():
+        return Region.mapping
+
+    @staticmethod
     def name_from_slug(slug):
         if slug not in Region.mapping:
             return "Unknown"
