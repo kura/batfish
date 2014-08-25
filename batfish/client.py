@@ -33,7 +33,7 @@ from batfish import __title__, __version__
 from .models import Droplet, Image, Region, Size
 
 
-hostname_valid_chars = re.compile(r"^[a-zA-Z0-9\.\-]*$")
+valid_chars = re.compile(r"^[a-zA-Z0-9\.\-]*$")
 
 
 def read_token_from_conf():
@@ -73,6 +73,15 @@ class Client(object):
                    'Content-Type': "application/json"}
         r = requests.post("{0}{1}".format(self.api_base, url),
                           headers=headers, data=json.dumps(payload))
+        return json.loads(r.text)
+
+    def post(self, url, payload):
+        headers = {'Authorization': "Bearer {0}".format(self.token),
+                   'User-Agent': "{0} ({1})".format(__title__,
+                                                    __version__),
+                   'Content-Type': "application/json"}
+        r = requests.put("{0}{1}".format(self.api_base, url),
+                         headers=headers, data=json.dumps(payload))
         return json.loads(r.text)
 
     def delete(self, url):
@@ -147,7 +156,7 @@ class Client(object):
     def droplet_rename(self, droplet, name):
         if isinstance(droplet, Droplet):
             droplet = droplet.id
-        if not hostname_valid_chars.match(name):
+        if not valid_chars.match(name):
             raise ValueError("""Only valid characters are allowed. """
                              """(a-z, A-Z, 0-9, . and -)""")
         print self.post('droplets/{0}/actions'.format(droplet),
@@ -156,7 +165,7 @@ class Client(object):
     def droplet_snapshot(self, droplet, name):
         if isinstance(droplet, Droplet):
             droplet = droplet.id
-        if not hostname_valid_chars.match(name):
+        if not valid_chars.match(name):
             raise ValueError("""Only valid characters are allowed. """
                              """(a-z, A-Z, 0-9, . and -)""")
         print self.post('droplets/{0}/actions'.format(droplet),
@@ -217,7 +226,7 @@ class Client(object):
             region = region.slug
         if not image.isdigit():
             image = image.lower()
-        if not hostname_valid_chars.match(name):
+        if not valid_chars.match(name):
             raise ValueError("""Only valid characters are allowed. """
                              """(a-z, A-Z, 0-9, . and -)""")
         d = {'name': name, 'size': size.lower(), 'image': image,
@@ -252,6 +261,27 @@ class Client(object):
         if 'image' not in j:
             return None
         return Image(j['image'])
+
+    def image_delete(self, image):
+        if isinstance(image, Image):
+            image = image.id
+        print self.delete('images/{0}'.format(image))
+
+    def image_rename(self, image, name):
+        if isinstance(image, Image):
+            image = image.id
+        if not valid_chars.match(name):
+            raise ValueError("""Only valid characters are allowed. """
+                             """(a-z, A-Z, 0-9, . and -)""")
+        print self.put("images/{0}".format(image), {'name': name})
+
+    def image_transfer(self, image, region):
+        if isinstance(image, Image):
+            image = image.id
+        if isinstance(region, Region):
+            region = region.slug
+        d = {'type': 'transfer', 'region': region}
+        print self.post("images/{0}/actions".format(image), d)
 
     def regions(self):
         j = self.get('regions')

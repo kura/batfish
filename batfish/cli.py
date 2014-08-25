@@ -310,6 +310,55 @@ def image(ctx, image):
                 image.region_names)
 
 
+@cli.command()
+@click.option('--image', help="Image name, slug or ID", required=True)
+@click.option('--accept', is_flag=True,
+              prompt="Are you sure you want to do this?")
+@click.pass_obj
+def image_delete(ctx, image, accept):
+    if accept is False:
+        return
+    if image.isdigit():
+        image = ctx.image_from_id(image)
+    else:
+        # assume name first, then try slug
+        image = ctx.image_from_name(image)
+        if image is None:
+            image = ctx.image_from_slug(image)
+    ctx.image_delete(image)
+
+
+@cli.command()
+@click.option('--image', help="Image name, slug or ID", required=True)
+@click.option('--name', required=True)
+@click.pass_obj
+def image_rename(ctx, image, name):
+    if image.isdigit():
+        image = ctx.image_from_id(image)
+    else:
+        # assume name first, then try slug
+        image = ctx.image_from_name(image)
+        if image is None:
+            image = ctx.image_from_slug(image)
+    ctx.image_rename(image, name)
+
+
+@cli.command()
+@click.option('--image', help="Image name, slug or ID", required=True)
+@click.option('--region', type=click.Choice(sorted(Region.mapping.keys())),
+              required=True)
+@click.pass_obj
+def image_transfer(ctx, image, region):
+    if image.isdigit():
+        image = ctx.image_from_id(image)
+    else:
+        # assume name first, then try slug
+        image = ctx.image_from_name(image)
+        if image is None:
+            image = ctx.image_from_slug(image)
+    ctx.image_transfer(image, region)
+
+
 def print_size(name, cpus, disk_size, price, regions):
     click.echo("""{0} (cpu(s): {1}, memory: {0}, disk: {2}) """
                """(price: {3}/hour {4}/month) regions: [{5}]""".format(name,
