@@ -75,7 +75,7 @@ class Client(object):
                           headers=headers, data=json.dumps(payload))
         return json.loads(r.text)
 
-    def post(self, url, payload):
+    def put(self, url, payload):
         headers = {'Authorization': "Bearer {0}".format(self.token),
                    'User-Agent': "{0} ({1})".format(__title__,
                                                     __version__),
