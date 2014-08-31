@@ -1,6 +1,8 @@
 from cmd import Cmd
 
 from .client import Client
+from .models.region import Region
+from .models.size import Size
 
 
 class Batfish(Cmd):
@@ -93,9 +95,9 @@ class Batfish(Cmd):
             droplet = droplet.id
         if not image.isdigit():
             # assume name first, then try slug
-            image = ctx.image_from_name(image)
+            image = self.ctx.image_from_name(image)
             if image is None:
-                image = ctx.image_from_slug(image)
+                image = self.ctx.image_from_slug(image)
             image = image.id
         self.ctx.droplet_rebuild(droplet, image)
 
@@ -143,6 +145,71 @@ class Batfish(Cmd):
             droplet = self.ctx.droplet_from_name(droplet)
             droplet = droplet.id
         self.ctx.droplet_enable_private_networking(droplet)
+
+    def print_image(self, iid, name, slug, distribution, regions):
+        print """{0} [id: {1}] (slug: {2}, distribution: {3}, """ \
+              """regions: [{4}])""".format(name, iid, slug,
+              distribution, ", ".join(regions))
+
+    def do_images(self, *args):
+        for image in self.ctx.images():
+            self.print_image(image.id, image.name, image.slug,
+                             image.distribution, image.region_names)
+
+    def do_image(self, image):
+        if image.isdigit():
+            image = self.ctx.image_from_id(image)
+        else:
+            image = self.ctx.image_from_name(image)
+            if image is None:
+                image = self.ctx.image_from_slug(image)
+        self.print_image(image.id, image.name, image.slug,
+                         image.distribution, image.region_names)
+
+    def do_image_delete(self, image):
+        accept = raw_input("Are you sure you want to do this? [y/N]: ")
+        if accept.lower() != 'y':
+            return
+        if image.isdigit():
+            image = self.ctx.image_from_name(image)
+        else:
+            if image is None:
+                image = self.ctx.image_from_slug(image)
+            image = image.id
+        self.ctx.image_delete(image)
+
+    def do_image_rename(self, image, name):
+        if image.isdigit():
+            image = self.ctx.image_from_name(image)
+        else:
+            if image is None:
+                image = self.ctx.image_from_slug(image)
+            image = image.id
+        self.ctx.image_rename(image, name)
+
+    def do_image_transfer(self, image, region):
+        if image.isdigit():
+            image = self.ctx.image_from_name(image)
+        else:
+            if image is None:
+                image = ctx.self.image_from_slug(image)
+            image = image.id
+        self.ctx.image_transfer(image, region)
+
+    def print_size(self, name, cpus, disk_size, price, regions):
+        print """{0} (cpu(s): {1}, memory: {0}, disk: {2}) """ \
+              """(price: {3}/hour {4}/month) regions: [{5}]""".format(name,
+              cpus, disk_size, price.hourly, price.monthly,
+              ", ".join(regions))
+
+    def do_sizes(self, detailed=False):
+        if not detailed:
+            for size in Size.mappings():
+                print size
+            return
+        for size in self.ctx.sizes():
+            self.print_size(size.slug.upper(), size.cpus, size.disk_size,
+                            size.price, size.region_names)
 
     def do_quit(self, args):
         """Quits the program."""
