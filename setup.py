@@ -32,11 +32,13 @@ desc = "A DigitalOcean shell, API and CLI interface"
 long_desc = open('README.rst').read() + "\n\n" + open('CHANGES.rst').read()
 long_desc = re.sub(r":[a-z]*:`", "`", long_desc)
 
-exec(open('batfish/__init__.py').read())
+exec(open('batfish/__about__.py').read())
 
 entry_points = {
     'console_scripts': [
         'batfish = batfish.cli:cli',
+        'batfish-cli = batfish.cli:cli',
+        'batfish-shell = batfish.shell:shell',
     ]
 }
 

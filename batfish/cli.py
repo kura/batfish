@@ -54,6 +54,7 @@ def print_droplet(name, cpu, memory, disk, ip, status, region, did):
                disk, ip, click.style("status: {0}".format(status), fg=colour),
                region))
 
+
 @cli.command()
 @click.pass_obj
 def droplets(ctx):
@@ -164,7 +165,7 @@ def droplet_shutdown(ctx, droplet, accept):
 @click.option('--accept', is_flag=True,
               prompt="Are you sure you want to do this?")
 @click.pass_obj
-def droplet_restore(ctx, droplet, accept):
+def droplet_restore(ctx, droplet, image, accept):
     if accept is False:
         return
     if not droplet.isdigit():
@@ -185,7 +186,7 @@ def droplet_restore(ctx, droplet, accept):
 @click.option('--accept', is_flag=True,
               prompt="Are you sure you want to do this?")
 @click.pass_obj
-def droplet_rebuild(ctx, droplet, accept):
+def droplet_rebuild(ctx, droplet, image, accept):
     if accept is False:
         return
     if not droplet.isdigit():

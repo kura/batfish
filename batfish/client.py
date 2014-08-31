@@ -29,7 +29,7 @@ import re
 
 import requests
 
-from batfish import __title__, __version__
+from batfish.__about__ import __title__, __version__
 from .models import Droplet, Image, Region, Size
 
 
@@ -51,6 +51,7 @@ def write_token_to_conf(token):
 class Client(object):
     token = None
     api_base = "https://api.digitalocean.com/v2/"
+    ua = "{0} ({1})".format(__title__.title(), __version__)
 
     def __init__(self):
         token = read_token_from_conf()
@@ -60,8 +61,7 @@ class Client(object):
     def get(self, url, headers=None):
         if headers is None:
             headers = {'Authorization': "Bearer {0}".format(self.token)}
-        headers['User-Agent'] = "{0} ({1})".format(__title__.title(),
-                                                   __version__)
+        headers['User-Agent'] = self.ua
         r = requests.get("{0}{1}".format(self.api_base, url), headers=headers)
         r.raise_for_status()
         return json.loads(r.text)
@@ -93,17 +93,13 @@ class Client(object):
 
     def authorize(self, token):
         h = {'Authorization': "Bearer {0}".format(token)}
-        r = self.get('actions', headers=h)
-        if r.status_code == 200:
-            write_token_to_conf(token)
-            self.token = token
-            return "OK"
-        if r.status_code == 404:
-            return "Unable to authorize"
-        else:
-            return """Unable to authorize due to unknown reason.""" \
-                   """Server responded with {0} - {1}""".format(r.status_code,
-                                                                r.reason)
+        try:
+            r = self.get('actions', headers=h)
+        except requests.HTTPError as e:
+            raise e
+        write_token_to_conf(token)
+        self.token = token
+        return "OK"
 
     def droplets(self):
         j = self.get('droplets')
