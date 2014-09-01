@@ -49,9 +49,14 @@ def write_token_to_conf(token):
 
 
 class Client(object):
+    """A Digital Ocean V2 client wrapper."""
+
     token = None
+    """API authentication token."""
     api_base = "https://api.digitalocean.com/v2/"
+    """API URL."""
     ua = "{0} ({1})".format(__title__.title(), __version__)
+    """Default User-Agent header."""
 
     def __init__(self):
         token = read_token_from_conf()
@@ -59,6 +64,17 @@ class Client(object):
             self.token = token
 
     def get(self, url, headers=None):
+        """
+        Send a GET request to the specified URL.
+
+            >>> cli = batfish.Client()
+            >>> cli.get("droplets", {'Custom-Header': "Something, something"})
+            {'response': "Nothing", 'reason': "Meh."}
+
+        :param url: URI part to query.
+        :param headers: Dictionary of headers to send.
+        :rtype: Dictionary of the JSON response.
+        """
         if headers is None:
             headers = {'Authorization': "Bearer {0}".format(self.token)}
         headers['User-Agent'] = self.ua
@@ -67,6 +83,17 @@ class Client(object):
         return json.loads(r.text)
 
     def post(self, url, payload):
+        """
+        Send a POST request to the specified URL with the payload.
+
+            >>> cli = batfish.Client()
+            >>> cli.post("droplets", {'droplet': 123456})
+            {'response': "Nothing", 'reason': "Meh."}
+
+        :param url: URI part to query.
+        :param payload: Dictionary of payload data.
+        :rtype: Dictionary of the JSON response.
+        """
         headers = {'Authorization': "Bearer {0}".format(self.token),
                    'User-Agent': "{0} ({1})".format(__title__,
                                                     __version__),
@@ -76,6 +103,17 @@ class Client(object):
         return json.loads(r.text)
 
     def put(self, url, payload):
+        """
+        Send a PUT request to the specified URL with the payload.
+
+            >>> cli = batfish.Client()
+            >>> cli.put("droplets", {'droplet': 123456})
+            {'response': "Nothing", 'reason': "Meh."}
+
+        :param url: URI part to query.
+        :param payload: Dictionary of payload data.
+        :rtype: Dictionary of the JSON response.
+        """
         headers = {'Authorization': "Bearer {0}".format(self.token),
                    'User-Agent': "{0} ({1})".format(__title__,
                                                     __version__),
@@ -85,6 +123,14 @@ class Client(object):
         return json.loads(r.text)
 
     def delete(self, url):
+        """
+        Send a DELETE request to the specified URL.
+
+            >>> cli = batfish.Client()
+            >>> cli.delete("droplet/123456")
+
+        :param url: URI part to query.
+        """
         headers = {'Authorization': "Bearer {0}".format(self.token),
                    'User-Agent': "{0} ({1})".format(__title__,
                                                     __version__)}
@@ -92,6 +138,16 @@ class Client(object):
                             headers=headers)
 
     def authorize(self, token):
+        """
+        Authorize the provided API token with the server.
+
+            >>> cli = batfish.Client()
+            >>> cli.authorize('abcdefghijkl1234567890')
+            OK
+
+        :param token: String token
+        :rtype: String "OK" or raise an exception on error.
+        """
         h = {'Authorization': "Bearer {0}".format(token)}
         try:
             r = self.get('actions', headers=h)
@@ -102,12 +158,31 @@ class Client(object):
         return "OK"
 
     def droplets(self):
+        """
+        Get a list of `batfish.models.Droplet` objects.
+
+            >>> cli = batfish.Client()
+            >>> cli.droplets()
+            [<Droplet droplet-1>, <Droplet droplet-2>, <Droplet droplet-3>]
+
+        :rtype: List of `batfish.models.Droplet` objects.
+        """
         j = self.get('droplets')
         if 'droplets' not in j:
             return None
         return [Droplet(d) for d in j['droplets']]
 
     def droplet_from_id(self, droplet_id):
+        """
+        Get an instance `batfish.models.Droplet` for the provided droplet ID.
+
+            >>> cli = batfish.Client()
+            >>> cli.droplet_from_id(123456)
+            <Droplet droplet-1>
+
+        :param droplet_id: Integer represenation of the droplet ID.
+        :rtype: Instance of `batfish.models.Droplet` or None.
+        """
         url = "droplets/{0}".format(droplet_id)
         try:
             j = self.get(url)
@@ -121,6 +196,16 @@ class Client(object):
         return Droplet(j['droplet'])
 
     def droplet_from_name(self, name):
+        """
+        Get an instance `batfish.models.Droplet` for the provided droplet name.
+
+            >>> cli = batfish.Client()
+            >>> cli.droplet_from_name("droplet-1")
+            <Droplet droplet-1>
+
+        :param droplet_id: Name of the droplet to query.
+        :rtype: Instance of `batfish.models.Droplet` or None.
+        """
         j = self.get('droplets')
         if 'droplets' not in j:
             return None
