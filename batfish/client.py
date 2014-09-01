@@ -157,6 +157,7 @@ class Client(object):
         self.token = token
         return "OK"
 
+    @property
     def droplets(self):
         """
         Get a list of `batfish.models.Droplet` objects.
@@ -215,8 +216,22 @@ class Client(object):
         return None
 
     def simple_droplet_image_action(self, action, droplet, image):
+        """
+        Send an API request to modify a droplet based on an image.
+
+            >>> cli = batfish.Client()
+            >>> cli.simple_droplet_image_action("restore", 123456, 98765)
+            {'response': "Nothing", 'reason': "Meh."}
+
+        :param action: The action to perform (restore, rebuild)
+        :param droplet: The droplet to modify, either a droplet ID or an
+                        instance of `batfish.models.Droplet`.
+        :param image: The image to use, either an image ID or an
+                      instance of `batfish.models.Image`.
+        :rtype: Dictionary of the JSON response.
+        """
         if action not in ['restore', 'rebuild', ]:
-            raise NotImplemented()
+            raise NotImplemented
         if isinstance(droplet, Droplet):
             droplet = droplet.id
         if isinstance(image, Image):
@@ -225,6 +240,21 @@ class Client(object):
                         {'type': action, 'image': image})
 
     def simple_droplet_action(self, action, droplet):
+        """
+        Send an API request to modify a droplet based on the action.
+
+            >>> cli = batfish.Client()
+            >>> cli.simple_droplet_action("reboot", 123456)
+            {'response': "Nothing", 'reason': "Meh."}
+
+        :param action: The action to perform ('reboot', 'power_cycle',
+                       'power_off', 'enable_ipv6', 'power_on',
+                       'password_reset', 'shutdown', 'disable_backups',
+                       'enable_private_networking')
+        :param droplet: The droplet to modify, either a droplet ID or an
+                        instance of `batfish.models.Droplet`.
+        :rtype: Dictionary of the JSON response.
+        """
         if action not in ['reboot', 'power_cycle', 'power_off', 'enable_ipv6',
                           'power_on', 'password_reset', 'shutdown',
                           'disable_backups', 'enable_private_networking', ]:
@@ -235,6 +265,18 @@ class Client(object):
                         {'type': action})
 
     def droplet_rename(self, droplet, name):
+        """
+        Send an API request rename a droplet.
+
+            >>> cli = batfish.Client()
+            >>> cli.droplet_rename(123456, "kura-test")
+            {'response': "Nothing", 'reason': "Meh."}
+
+        :param droplet: The droplet to modify, either a droplet ID or an
+                        instance of `batfish.models.Droplet`.
+        :param name: A string of the new name.
+        :rtype: Dictionary of the JSON response.
+        """
         if isinstance(droplet, Droplet):
             droplet = droplet.id
         if not valid_chars.match(name):
@@ -244,6 +286,18 @@ class Client(object):
                         {'type': 'rename', 'name': name})
 
     def droplet_snapshot(self, droplet, name):
+        """
+        Send an API request to snapshot a droplet.
+
+            >>> cli = batfish.Client()
+            >>> cli.droplet_snapshot(123456, "kura-test")
+            {'response': "Nothing", 'reason': "Meh."}
+
+        :param droplet: The droplet to modify, either a droplet ID or an
+                        instance of `batfish.models.Droplet`.
+        :param name: A string of the snapshot name.
+        :rtype: Dictionary of the JSON response.
+        """
         if isinstance(droplet, Droplet):
             droplet = droplet.id
         if not valid_chars.match(name):
@@ -314,6 +368,7 @@ class Client(object):
              'region': region}
         print self.post('droplets', d)
 
+    @property
     def images(self):
         j = self.get('images')
         if 'images' not in j:
@@ -364,6 +419,7 @@ class Client(object):
         d = {'type': 'transfer', 'region': region}
         print self.post("images/{0}/actions".format(image), d)
 
+    @property
     def regions(self):
         j = self.get('regions')
         return [Region(r) for r in j['regions']]
@@ -382,6 +438,7 @@ class Client(object):
                 return Region(r)
         return None
 
+    @property
     def sizes(self):
         j = self.get('sizes')
         return [Size(s) for s in j['sizes']]

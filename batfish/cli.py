@@ -57,7 +57,7 @@ def print_droplet(name, cpu, memory, disk, ip, status, region, did):
 @cli.command()
 @click.pass_obj
 def droplets(ctx):
-    for droplet in ctx.droplets():
+    for droplet in ctx.droplets:
         print_droplet(droplet.name, droplet.cpus, droplet.memory,
                       droplet.disk_size, droplet.networks['ipv4'][0].ip,
                       droplet.status, droplet.region_name,
@@ -290,7 +290,7 @@ def print_image(iid, name, slug, distribution, regions):
 @cli.command()
 @click.pass_obj
 def images(ctx):
-    for image in ctx.images():
+    for image in ctx.images:
         print_image(image.id, image.name, image.slug, image.distribution,
                     image.region_names)
 
@@ -375,6 +375,6 @@ def sizes(ctx, detailed):
         for size in Size.mappings():
             click.echo(size)
         return
-    for size in ctx.sizes():
+    for size in ctx.sizes:
         print_size(size.slug.upper(), size.cpus, size.disk_size, size.price,
                    size.region_names)

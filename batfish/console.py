@@ -17,7 +17,7 @@ class Batfish(Cmd):
               cpu, memory, disk, ip, status, region)
 
     def do_droplets(self, *args):
-        for droplet in self.ctx.droplets():
+        for droplet in self.ctx.droplets:
             self.print_droplet(droplet.name, droplet.cpus, droplet.memory,
                                droplet.disk_size,
                                droplet.networks['ipv4'][0].ip,
@@ -152,7 +152,7 @@ class Batfish(Cmd):
               distribution, ", ".join(regions))
 
     def do_images(self, *args):
-        for image in self.ctx.images():
+        for image in self.ctx.images:
             self.print_image(image.id, image.name, image.slug,
                              image.distribution, image.region_names)
 
