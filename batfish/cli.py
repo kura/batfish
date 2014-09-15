@@ -26,7 +26,7 @@
 import click
 
 from .client import Client
-from .models import Regiom, Size
+from .models import Region, Size
 
 
 @click.group()

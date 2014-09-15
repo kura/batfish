@@ -95,8 +95,7 @@ class Client(object):
         :rtype: Dictionary of the JSON response.
         """
         headers = {'Authorization': "Bearer {0}".format(self.token),
-                   'User-Agent': "{0} ({1})".format(__title__,
-                                                    __version__),
+                   'User-Agent': self.ua,
                    'Content-Type': "application/json"}
         r = requests.post("{0}{1}".format(self.api_base, url),
                           headers=headers, data=json.dumps(payload))
@@ -115,8 +114,7 @@ class Client(object):
         :rtype: Dictionary of the JSON response.
         """
         headers = {'Authorization': "Bearer {0}".format(self.token),
-                   'User-Agent': "{0} ({1})".format(__title__,
-                                                    __version__),
+                   'User-Agent': self.ua,
                    'Content-Type': "application/json"}
         r = requests.put("{0}{1}".format(self.api_base, url),
                          headers=headers, data=json.dumps(payload))
@@ -132,8 +130,7 @@ class Client(object):
         :param url: URI part to query.
         """
         headers = {'Authorization': "Bearer {0}".format(self.token),
-                   'User-Agent': "{0} ({1})".format(__title__,
-                                                    __version__)}
+                   'User-Agent': self.ua,}
         r = requests.delete("{0}{1}".format(self.api_base, url),
                             headers=headers)
 

@@ -1,6 +1,6 @@
-API - Client Library
+API - models.Droplet
 ====================
 
-.. autoclass:: batfish.Client
+.. autoclass:: batfish.models.Droplet
    :inherited-members:
    :member-order: bysource
