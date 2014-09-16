@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 .PHONY: clean coverage deps deps-docs deps-test docs flake8 install pypi rtd test tox uninstall
 
 clean:
@@ -35,7 +36,7 @@ rtd:
 	curl -X POST https://readthedocs.org/build/batfish
 
 test:
-	nosetests
+	nosetests --processes=$(shell grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu) --with-progressive
 
 tox: deps deps-test
 	pip install detox
