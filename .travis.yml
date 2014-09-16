@@ -12,3 +12,4 @@ script:
   - coverage run --source=batfish runtests.py
 after_success:
   - coveralls
+  - curl -X POST https://readthedocs.org/build/batfish
