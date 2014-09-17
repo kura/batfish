@@ -38,7 +38,7 @@ entry_points = {
     'console_scripts': [
         'batfish = batfish.cli:cli',
         'batfish-cli = batfish.cli:cli',
-        'batfish-console = batfish.shell:console',
+        'batfish-console = batfish.console:shell',
     ]
 }
 
