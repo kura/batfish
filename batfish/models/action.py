@@ -25,8 +25,15 @@
 
 from datetime import datetime
 
+from .region import Region
+
 
 class Action(object):
+    """
+    A Digital Ocean action.
+
+    :param action_data: A dictionary of action data from the API.
+    """
     _data = None
 
     def __init__(self, action_data):
@@ -40,33 +47,128 @@ class Action(object):
 
     @property
     def id(self):
+        """
+        The ID of the action.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].id
+            1234
+
+        :rtype: `integer`
+        """
         return self._data['id']
 
     @property
     def status(self):
+        """
+        The status of the action.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].status
+            'completed'
+
+        :rtype: `string`.
+        """
         return self._data['status']
 
     @property
     def type(self):
+        """
+        The type of action.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].type
+            'rebuild'
+
+        :rtype: `string`.
+        """
         return self._data['type']
 
     @property
     def started(self):
+        """
+        The date and time the action was started.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].started
+            datetime.datetime(2014, 1, 7, 23, 19, 49)
+
+        :rtype: `datetime.datetime` object.
+        """
         return datetime.strptime(self._data['started_at'],
                                  '%Y-%m-%dT%H:%M:%SZ')
 
     @property
     def completed(self):
+        """
+        The date and time the action was completed.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].completed
+            datetime.datetime(2014, 1, 7, 23, 19, 49)
+
+        :rtype: `datetime.datetime` object, `None` if not completed.
+        """
+        if self._data['completed_at'] is None:
+            return None
         return datetime.strptime(self._data['completed_at'],
                                  '%Y-%m-%dT%H:%M:%SZ')
 
     @property
     def resource_id(self):
+        """
+        The ID of the resource the action was done on.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].resource_id
+            3
+
+        :rtype: `integer`.
+        """
         return self._data['resource_id']
 
     @property
     def resource_type(self):
+        """
+        The type of the resource the action was done on.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].resource_type
+            'droplet'
+
+        :rtype: `string`.
+        """
         return self._data['resource_type']
 
     def region(self, client):
+        """
+        The region the action was done in.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].region
+            <Region Amsterdam 2>
+
+        :rtype: An instance `of batfish.models.region.Region`.
+        """
         return client.region_from_slug(self._data['region']['slug'])
+
+    def region_name(self, client):
+        """
+        The region name the action was done in.
+
+            >>> cli = batfish.Client()
+            >>> droplet = cli.droplet_from_id(1234)
+            >>> droplet.actions[0].region_name
+            'Amsterdam 2'
+
+        :rtype: `string`.
+        """
+        return Region.name_from_slug(self._data['region']['slug'])

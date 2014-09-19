@@ -12,7 +12,11 @@ Contents:
    :maxdepth: 2
 
    api-client
+   api-models-action
    api-models-droplet
+   api-models-image
+   api-models-region
+   api-models-size
 
 
 

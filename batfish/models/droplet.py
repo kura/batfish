@@ -50,62 +50,85 @@ class Droplet(object):
     @property
     def id(self):
         """
+        The droplet ID.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.id
             1234
+
+        :rtype: `integer`.
         """
         return self._data['id']
 
     @property
     def name(self):
         """
+        The name of the droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.name
-            u"kura-test"
+            "kura-test"
+
+        :rtype: `string`.
         """
         return self._data['name']
 
     @property
     def memory(self):
         """
+        The amount of RAM of the droplet, including measurement unit.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.memory
-            u'512MB'
+            '512MB'
+        :rtype: `string`.
         """
         return self._data['memory']
 
     @property
     def cpus(self):
         """
+        The number of CPUs of the droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.cpus
             1
+
+        :rtype: `integer`.
         """
         return self._data['vcpus']
 
     @property
     def disk_size(self):
         """
+        The disk size of the droplet, including measurement unit.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.disk_size
-            u'20GB'
+            '20GB'
+
+        :rtype: `string`.
         """
         return "{0}GB".format(self._data['disk'])
 
     @property
     def region_name(self):
         """
+        The name of the region the droplet is in.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.region_name
             <Region Amsterdam 2>
             >>> droplet.region_name.name
-            u'Amsterdam 2'
+            'Amsterdam 2'
+
+        :rtype: `string`.
         """
         return Region.name_from_slug(self._data['region']['slug'])
 
@@ -132,11 +155,15 @@ class Droplet(object):
     @property
     def size(self):
         """
+        The size of the droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.size
-            Size(name=u'512MB', memory=u'512MB', disk='20GBGB',
+            Size(name='512MB', memory='512MB', disk='20GB',
                  hourly=0.00744, monthly=5.0)
+
+        :rtype: `collections.NamedTuple`.
         """
         size = namedtuple('Size', 'name memory disk hourly monthly')
         return size(name=self._data['size']['slug'].upper(),
@@ -148,20 +175,28 @@ class Droplet(object):
     @property
     def locked(self):
         """
+        The lock status of the droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.locked
             False
+
+        :rtype: `boolean`.
         """
         return self._data['locked']
 
     @property
     def created(self):
         """
+        The date and time a droplet was created.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.created
             datetime.datetime(2014, 1, 7, 23, 19, 49)
+
+        :rtype: `datetime.datime` object.
         """
         return datetime.strptime(self._data['created_at'],
                                  '%Y-%m-%dT%H:%M:%SZ')
@@ -169,24 +204,32 @@ class Droplet(object):
     @property
     def status(self):
         """
+        The status of the droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.status
-            u'active'
+            'active'
+
+        :rtype: `string`.
         """
         return self._data['status']
 
     @property
     def networks(self):
         """
+        Network connections of a droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.networks
-            {'ipv4': [IPv4(ip=u'10.12.1.1', type=u'private',
-                           gateway=u'10.12.0.1', netmask=u'255.255.0.0'),
-                      IPv4(ip=u'95.85.62.206', type=u'public',
-                           gateway=u'95.85.62.1', netmask=u'255.255.255.0')],
+            {'ipv4': [IPv4(ip='10.12.1.1', type='private',
+                           gateway='10.12.0.1', netmask='255.255.0.0'),
+                      IPv4(ip='95.85.62.206', type='public',
+                           gateway='95.85.62.1', netmask='255.255.255.0')],
              'ipv6': []}
+
+        :rtype: `dictionary` of `collection.NamedTuples`s.
         """
         ipv4 = namedtuple('IPv4', 'ip type gateway netmask')
         ipv6 = namedtuple('IPv6', 'ip type gateway')
@@ -202,12 +245,16 @@ class Droplet(object):
     @property
     def kernel(self):
         """
+        The currently active kernel of a droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.kernel
             Kernel(id=140,
-                   name=u'Debian 7.0 x64 vmlinuz-3.2.0-4-amd64  (3.2.41-2)',
-                   version=u'3.2.0-4-amd64')
+                   name='Debian 7.0 x64 vmlinuz-3.2.0-4-amd64  (3.2.41-2)',
+                   version='3.2.0-4-amd64')
+
+        :rtype: `collections.NamedTuple`.
         """
         kernel = namedtuple('Kernel', 'id name version')
         return kernel(id=int(self._data['kernel']['id']),
@@ -217,26 +264,34 @@ class Droplet(object):
     @property
     def backups(self):
         """
+        Existing backups of a droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.backups
             [123, 124, 125]
+
+        :rtype: `list` of backup IDs.
         """
         return self._data['backup_ids']
 
     @property
     def snapshots(self):
         """
+        Existing snapshops of a droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.backups
             [123, 124, 125]
+
+        :rtype: `list` of snapshot IDs.
         """
         return self._data['snapshot_ids']
 
     def actions(self, client):
         """
-        Get a list of actions that have been performed on the droplet.
+        A list of actions that have been performed on the droplet.
 
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
@@ -254,9 +309,13 @@ class Droplet(object):
     @property
     def features(self):
         """
+        A list of features currently active on a droplet.
+
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.features
-            [u'private_networking', u'virtio']
+            ['private_networking', 'virtio']
+
+        :rtype: `list`.
         """
         return self._data['features']

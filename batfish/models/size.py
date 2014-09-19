@@ -52,7 +52,7 @@ class Size(object):
 
     @property
     def memory(self):
-        return self._data['memory']
+        return self._data['memory'].upper()
 
     @property
     def cpus(self):

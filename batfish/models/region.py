@@ -42,6 +42,18 @@ class Region(object):
 
     @staticmethod
     def mappings():
+        """
+        A mapping of region slug to name.
+
+            >>> Region.mappings
+            {'ams1': 'Amsterdam 1', 'ams2': 'Amsterdam 2',
+                       'ams3': 'Amsterdam 3', 'lon1': 'London 1',
+                       'nyc1': 'New York 1', 'nyc2': 'New York 2',
+                       'nyc3': 'New York 3', 'sfo1': 'San Fancisco 1',
+                       'sgp1': 'Singapore 1'}
+
+        :rtype: `dictionary`.
+        """
         return Region.mapping
 
     @staticmethod
