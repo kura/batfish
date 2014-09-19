@@ -23,9 +23,9 @@
 # SOFTWARE.
 
 
-from collections import namedtuple
 from datetime import datetime
 
+from .action import Action
 from .region import Region
 
 
@@ -76,4 +76,5 @@ class Image(object):
 
     @property
     def created(self):
-        return datetime.strptime(self._data['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self._data['created_at'],
+                                 '%Y-%m-%dT%H:%M:%SZ')

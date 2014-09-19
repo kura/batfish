@@ -99,6 +99,7 @@ class Client(object):
                    'Content-Type': "application/json"}
         r = requests.post("{0}{1}".format(self.api_base, url),
                           headers=headers, data=json.dumps(payload))
+        r.raise_for_status()
         return json.loads(r.text)
 
     def put(self, url, payload):
@@ -118,6 +119,7 @@ class Client(object):
                    'Content-Type': "application/json"}
         r = requests.put("{0}{1}".format(self.api_base, url),
                          headers=headers, data=json.dumps(payload))
+        r.raise_for_status()
         return json.loads(r.text)
 
     def delete(self, url):
@@ -130,9 +132,10 @@ class Client(object):
         :param url: URI part to query.
         """
         headers = {'Authorization': "Bearer {0}".format(self.token),
-                   'User-Agent': self.ua,}
+                   'User-Agent': self.ua}
         r = requests.delete("{0}{1}".format(self.api_base, url),
                             headers=headers)
+        r.raise_for_status()
 
     def authorize(self, token):
         """
@@ -147,7 +150,7 @@ class Client(object):
         """
         h = {'Authorization': "Bearer {0}".format(token)}
         try:
-            r = self.get('actions', headers=h)
+            self.get('actions', headers=h)
         except requests.HTTPError as e:
             raise e
         write_token_to_conf(token)
@@ -160,7 +163,7 @@ class Client(object):
         Get a list of `batfish.models.Droplet` objects.
 
             >>> cli = batfish.Client()
-            >>> cli.droplets()
+            >>> cli.droplets
             [<Droplet droplet-1>, <Droplet droplet-2>, <Droplet droplet-3>]
 
         :rtype: List of `batfish.models.Droplet` objects.
@@ -233,8 +236,8 @@ class Client(object):
             droplet = droplet.id
         if isinstance(image, Image):
             image = image.id
-        print self.post('droplets/{0}/actions'.format(droplet),
-                        {'type': action, 'image': image})
+        print(self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': action, 'image': image}))
 
     def simple_droplet_action(self, action, droplet):
         """
@@ -258,8 +261,8 @@ class Client(object):
             raise NotImplemented()
         if isinstance(droplet, Droplet):
             droplet = droplet.id
-        print self.post('droplets/{0}/actions'.format(droplet),
-                        {'type': action})
+        print(self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': action}))
 
     def droplet_rename(self, droplet, name):
         """
@@ -279,8 +282,8 @@ class Client(object):
         if not valid_chars.match(name):
             raise ValueError("""Only valid characters are allowed. """
                              """(a-z, A-Z, 0-9, . and -)""")
-        print self.post('droplets/{0}/actions'.format(droplet),
-                        {'type': 'rename', 'name': name})
+        print(self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': 'rename', 'name': name}))
 
     def droplet_snapshot(self, droplet, name):
         """
@@ -300,8 +303,8 @@ class Client(object):
         if not valid_chars.match(name):
             raise ValueError("""Only valid characters are allowed. """
                              """(a-z, A-Z, 0-9, . and -)""")
-        print self.post('droplets/{0}/actions'.format(droplet),
-                        {'type': 'snapshot', 'name': name})
+        print(self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': 'snapshot', 'name': name}))
 
     def droplet_resize(self, droplet, size):
         """
@@ -321,8 +324,8 @@ class Client(object):
             droplet = droplet.id
         if isinstance(size, Size):
             size = size.slug
-        print self.post('droplets/{0}/actions'.format(droplet),
-                        {'type': 'resize', 'size': size})
+        print(self.post('droplets/{0}/actions'.format(droplet),
+                        {'type': 'resize', 'size': size}))
 
     def droplet_restore(self, droplet, image):
         """
@@ -496,7 +499,7 @@ class Client(object):
         """
         if isinstance(droplet, Droplet):
             droplet = droplet.id
-        print self.delete('droplets/{0}'.format(droplet))
+        print(self.delete('droplets/{0}'.format(droplet)))
 
     def droplet_create(self, name, region, size, image):
         """
@@ -528,7 +531,7 @@ class Client(object):
                              """(a-z, A-Z, 0-9, . and -)""")
         d = {'name': name, 'size': size.lower(), 'image': image,
              'region': region}
-        print self.post('droplets', d)
+        print(self.post('droplets', d))
 
     @property
     def images(self):
@@ -611,7 +614,7 @@ class Client(object):
         """
         if isinstance(image, Image):
             image = image.id
-        print self.delete('images/{0}'.format(image))
+        print(self.delete('images/{0}'.format(image)))
 
     def image_rename(self, image, name):
         """
@@ -631,7 +634,7 @@ class Client(object):
         if not valid_chars.match(name):
             raise ValueError("""Only valid characters are allowed. """
                              """(a-z, A-Z, 0-9, . and -)""")
-        print self.put("images/{0}".format(image), {'name': name})
+        print(self.put("images/{0}".format(image), {'name': name}))
 
     def image_transfer(self, image, region):
         if isinstance(image, Image):
@@ -639,7 +642,7 @@ class Client(object):
         if isinstance(region, Region):
             region = region.slug
         d = {'type': 'transfer', 'region': region}
-        print self.post("images/{0}/actions".format(image), d)
+        print(self.post("images/{0}/actions".format(image), d))
 
     @property
     def regions(self):

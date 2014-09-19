@@ -1,4 +1,4 @@
-import os
+import collections
 import unittest
 
 import responses
@@ -6,15 +6,7 @@ from requests import HTTPError
 from mock import patch
 
 from batfish import Client
-
-
-class TestClientToken(unittest.TestCase):
-
-    def test_client_token(self):
-        with patch('batfish.client.read_token_from_conf',
-                   return_value="test_token"):
-            cli = Client()
-            self.assertEqual(cli.token, "test_token")
+from batfish.__about__ import __version__
 
 
 class TestClientGet(unittest.TestCase):
@@ -49,10 +41,12 @@ class TestClientGet(unittest.TestCase):
                       body='{"message": "something"}', status=200,
                       content_type="application/json")
         self.cli.get('kura')
-        h = {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate',
+        h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
              'Authorization': "Bearer test_token",
-             'User-Agent': 'Batfish (0.0.0)'}
-        self.assertEquals(responses.calls[0].request.headers, h)
+             'User-Agent': "Batfish ({0})".format(__version__)}
+        th = collections.OrderedDict(sorted(h.items()))
+        rh = collections.OrderedDict(sorted(responses.calls[0].request.headers.items()))
+        self.assertEquals(rh, th)
 
     @responses.activate
     def test_get_headers_modified_ua(self):
@@ -62,10 +56,12 @@ class TestClientGet(unittest.TestCase):
                       content_type="application/json")
         self.cli.ua = "Kura"
         self.cli.get('kura')
-        h = {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate',
+        h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
              'Authorization': "Bearer test_token",
-             'User-Agent': 'Kura'}
-        self.assertEquals(responses.calls[0].request.headers, h)
+             'User-Agent': "Kura"}
+        th = collections.OrderedDict(sorted(h.items()))
+        rh = collections.OrderedDict(sorted(responses.calls[0].request.headers.items()))
+        self.assertEquals(rh, th)
 
     @responses.activate
     def test_get_headers_custom(self):
@@ -75,7 +71,7 @@ class TestClientGet(unittest.TestCase):
                       content_type="application/json")
         h = {'Authorization': "Bearer test_token2", 'X-Random-Header': 'test'}
         self.cli.get('kura', headers=h)
-        h = {'Accept': '*/*', 'Accept-Encoding': 'gzip, deflate',
-             'Authorization': "Bearer test_token2", 'X-Random-Header': 'test',
-             'User-Agent': "Batfish (0.0.0)"}
+        h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
+             'Authorization': "Bearer test_token2", 'X-Random-Header': "test",
+             'User-Agent': 'Batfish ({0})'.format(__version__)}
         self.assertEquals(responses.calls[0].request.headers, h)

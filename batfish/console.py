@@ -1,7 +1,7 @@
 from cmd import Cmd
 
 from .client import Client
-from .models.region import Region
+# from .models.region import Region
 from .models.size import Size
 
 
@@ -9,12 +9,12 @@ class Batfish(Cmd):
     ctx = Client()
 
     def do_authorize(self, token):
-        print self.ctx.authorize(token)
+        print(self.ctx.authorize(token))
 
     def print_droplet(self, name, cpu, memory, disk, ip, status, region, did):
-        print """{0} [id: {1}] (cpu(s): {2}, mem: {3}MB, disk: {4}, """ \
-              """ip: {5}, status: {6}, region: {7})""".format(name, did,
-              cpu, memory, disk, ip, status, region)
+        print("""{0} [id: {1}] (cpu(s): {2}, mem: {3}MB, disk: {4}, """
+              """ip: {5}, status: {6}, region: {7})"""
+              """""".format(name, did, cpu, memory, disk, ip, status, region))
 
     def do_droplets(self, *args):
         for droplet in self.ctx.droplets:
@@ -147,9 +147,9 @@ class Batfish(Cmd):
         self.ctx.droplet_enable_private_networking(droplet)
 
     def print_image(self, iid, name, slug, distribution, regions):
-        print """{0} [id: {1}] (slug: {2}, distribution: {3}, """ \
+        print("""{0} [id: {1}] (slug: {2}, distribution: {3}, """
               """regions: [{4}])""".format(name, iid, slug,
-              distribution, ", ".join(regions))
+                                           distribution, ", ".join(regions)))
 
     def do_images(self, *args):
         for image in self.ctx.images:
@@ -192,20 +192,20 @@ class Batfish(Cmd):
             image = self.ctx.image_from_name(image)
         else:
             if image is None:
-                image = ctx.self.image_from_slug(image)
+                image = self.ctx.self.image_from_slug(image)
             image = image.id
         self.ctx.image_transfer(image, region)
 
     def print_size(self, name, cpus, disk_size, price, regions):
-        print """{0} (cpu(s): {1}, memory: {0}, disk: {2}) """ \
-              """(price: {3}/hour {4}/month) regions: [{5}]""".format(name,
-              cpus, disk_size, price.hourly, price.monthly,
-              ", ".join(regions))
+        print("""{0} (cpu(s): {1}, memory: {0}, disk: {2}) """
+              """(price: {3}/hour {4}/month) regions: [{5}]"""
+              """""".format(name, cpus, disk_size, price.hourly,
+                            price.monthly, ", ".join(regions)))
 
     def do_sizes(self, detailed=False):
         if not detailed:
             for size in Size.mappings():
-                print size
+                print(size)
             return
         for size in self.ctx.sizes():
             self.print_size(size.slug.upper(), size.cpus, size.disk_size,

@@ -23,7 +23,6 @@
 # SOFTWARE.
 
 
-from collections import namedtuple
 from datetime import datetime
 
 
@@ -53,11 +52,13 @@ class Action(object):
 
     @property
     def started(self):
-        return datetime.strptime(self._data['started_at'], '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self._data['started_at'],
+                                 '%Y-%m-%dT%H:%M:%SZ')
 
     @property
     def completed(self):
-        return datetime.strptime(self._data['completed_at'], '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self._data['completed_at'],
+                                 '%Y-%m-%dT%H:%M:%SZ')
 
     @property
     def resource_id(self):

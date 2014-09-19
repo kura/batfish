@@ -40,7 +40,11 @@ def cli(ctx):
 @click.pass_obj
 def authorize(ctx, token):
     resp = ctx.authorize(token)
-    print resp
+    if resp == "OK":
+        colour = 'green'
+    else:
+        colour = 'red'
+    click.echo(click.style(resp, fg=colour))
 
 
 def print_droplet(name, cpu, memory, disk, ip, status, region, did):
@@ -49,9 +53,10 @@ def print_droplet(name, cpu, memory, disk, ip, status, region, did):
     else:
         colour = 'red'
     click.echo("""{0} [id: {1}] (cpu(s): {2}, mem: {3}MB, disk: {4}, """
-               """ip: {5}, {6}, region: {7})""".format(name, did, cpu, memory,
-               disk, ip, click.style("status: {0}".format(status), fg=colour),
-               region))
+               """ip: {5}, {6}, region: {7})"""
+               """""".format(name, did, cpu, memory, disk, ip,
+                             click.style("status: {0}".format(status),
+                                         fg=colour), region))
 
 
 @cli.command()
@@ -102,7 +107,7 @@ def droplet_power_cycle(ctx, droplet, accept):
         return
     if not droplet.isdigit():
         droplet = ctx.droplet_from_name(droplet)
-        droplet = dtoplet.id
+        droplet = droplet.id
     ctx.droplet_power_cycle(droplet)
 
 
@@ -283,8 +288,8 @@ def droplet_enable_private_networking(ctx, droplet):
 
 def print_image(iid, name, slug, distribution, regions):
     click.echo("""{0} [id: {1}] (slug: {2}, distribution: {3}, """
-               """regions: [{4}])""".format(name, iid, slug,
-               distribution, ", ".join(regions)))
+               """regions: [{4}])""".format(name, iid, slug, distribution,
+                                            ", ".join(regions)))
 
 
 @cli.command()
@@ -361,9 +366,9 @@ def image_transfer(ctx, image, region):
 
 def print_size(name, cpus, disk_size, price, regions):
     click.echo("""{0} (cpu(s): {1}, memory: {0}, disk: {2}) """
-               """(price: {3}/hour {4}/month) regions: [{5}]""".format(name,
-               cpus, disk_size, price.hourly, price.monthly,
-               ", ".join(regions)))
+               """(price: {3}/hour {4}/month) regions: [{5}]"""
+               """""".format(name, cpus, disk_size, price.hourly,
+                             price.monthly, ", ".join(regions)))
 
 
 @cli.command()

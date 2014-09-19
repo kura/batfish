@@ -135,7 +135,8 @@ class Droplet(object):
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.size
-            Size(name=u'512MB', memory=u'512MB', disk='20GBGB', hourly=0.00744, monthly=5.0)
+            Size(name=u'512MB', memory=u'512MB', disk='20GBGB',
+                 hourly=0.00744, monthly=5.0)
         """
         size = namedtuple('Size', 'name memory disk hourly monthly')
         return size(name=self._data['size']['slug'].upper(),
@@ -162,7 +163,8 @@ class Droplet(object):
             >>> droplet.created
             datetime.datetime(2014, 1, 7, 23, 19, 49)
         """
-        return datetime.strptime(self._data['created_at'], '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.strptime(self._data['created_at'],
+                                 '%Y-%m-%dT%H:%M:%SZ')
 
     @property
     def status(self):
@@ -191,10 +193,10 @@ class Droplet(object):
         networks = {}
         networks['ipv4'] = [ipv4(ip=n['ip_address'], type=n['type'],
                                  gateway=n['gateway'], netmask=n['netmask'])
-                                 for n in self._data['networks']['v4']]
+                            for n in self._data['networks']['v4']]
         networks['ipv6'] = [ipv6(ip=n['ip_address'], type=n['type'],
                                  gateway=n['gateway'])
-                                 for n in self._data['networks']['v6']]
+                            for n in self._data['networks']['v6']]
         return networks
 
     @property
@@ -203,7 +205,9 @@ class Droplet(object):
             >>> cli = batfish.Client()
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.kernel
-            Kernel(id=140, name=u'Debian 7.0 x64 vmlinuz-3.2.0-4-amd64  (3.2.41-2) ', version=u'3.2.0-4-amd64')
+            Kernel(id=140,
+                   name=u'Debian 7.0 x64 vmlinuz-3.2.0-4-amd64  (3.2.41-2)',
+                   version=u'3.2.0-4-amd64')
         """
         kernel = namedtuple('Kernel', 'id name version')
         return kernel(id=int(self._data['kernel']['id']),
