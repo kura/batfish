@@ -30,7 +30,7 @@ pypi: rtd
 	pip install -r requirements-pypi.txt
 	python setup.py register
 	python setup.py sdist bdist_wheel
-        twine upload dist/*
+	twine upload dist/*
 
 rtd:
 	curl -X POST https://readthedocs.org/build/batfish
