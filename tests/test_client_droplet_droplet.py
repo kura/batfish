@@ -21,8 +21,19 @@ class TestClientDroplet_droplets(unittest.TestCase):
                    return_value=None):
             self.cli = Client()
 
+    @reponses.activate
+    def test_droplets_none(self):
+        url = "https://api.digitalocean.com/v2/droplets"
+        responses.add(responses.GET, url,
+                      body="{}", status=200,
+                      content_type="application/json")
+        droplets = self.cli.droplets
+        self.assertEquals(responses.calls[0].response.status_code, 200)
+        self.assertEquals(droplets, None)
+
+
     @responses.activate
-    def test_authorize_unauthorized(self):
+    def test_droplets_list(self):
         url = "https://api.digitalocean.com/v2/droplets"
         responses.add(responses.GET, url,
                       body=self.good_resp, status=200,
