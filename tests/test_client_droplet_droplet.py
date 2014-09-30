@@ -21,7 +21,7 @@ class TestClientDroplet_droplets(unittest.TestCase):
                    return_value=None):
             self.cli = Client()
 
-    @reponses.activate
+    @responses.activate
     def test_droplets_none(self):
         url = "https://api.digitalocean.com/v2/droplets"
         responses.add(responses.GET, url,
