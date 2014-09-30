@@ -1,0 +1,159 @@
+
+{
+    "droplets": [
+        {
+            "backup_ids": [],
+            "created_at": "2013-08-01T15:24:52Z",
+            "disk": 20,
+            "features": [
+                "virtio"
+            ],
+            "id": 111111,
+            "image": {
+                "created_at": "2013-07-13T18:12:25Z",
+                "distribution": "Debian",
+                "id": 111111,
+                "name": "base",
+                "public": false,
+                "regions": [
+                    "nyc1",
+                    "ams1",
+                    "sfo1",
+                    "nyc2",
+                    "ams2",
+                    "sgp1",
+                    "lon1",
+                    "nyc3",
+                    "ams3"
+                ],
+                "slug": null
+            },
+            "kernel": {
+                "id": 140,
+                "name": "Debian 7.0 x64 vmlinuz-3.2.0-4-amd64  (3.2.41-2) ",
+                "version": "3.2.0-4-amd64"
+            },
+            "locked": false,
+            "memory": 512,
+            "name": "test1",
+            "networks": {
+                "v4": [
+                    {
+                        "gateway": "1.1.1.1",
+                        "ip_address": "1.1.1.2",
+                        "netmask": "255.255.255.0",
+                        "type": "public"
+                    }
+                ],
+                "v6": []
+            },
+            "region": {
+                "available": true,
+                "features": [
+                    "virtio",
+                    "backups"
+                ],
+                "name": "Amsterdam 1",
+                "sizes": [
+                    "512mb",
+                    "1gb",
+                    "4gb",
+                    "2gb",
+                    "8gb",
+                    "16gb"
+                ],
+                "slug": "ams1"
+            },
+            "size": {
+                "price_hourly": 0.00744,
+                "price_monthly": 5.0,
+                "slug": "512mb",
+                "transfer": 1
+            },
+            "snapshot_ids": [],
+            "status": "active",
+            "vcpus": 1
+        },
+        {
+            "backup_ids": [],
+            "created_at": "2014-02-14T20:39:45Z",
+            "disk": 20,
+            "features": [
+                "virtio"
+            ],
+            "id": 111112,
+            "image": {
+                "created_at": "2013-07-13T18:12:25Z",
+                "distribution": "Debian",
+                "id": 11111,
+                "name": "base",
+                "public": false,
+                "regions": [
+                    "nyc1",
+                    "ams1",
+                    "sfo1",
+                    "nyc2",
+                    "ams2",
+                    "sgp1",
+                    "lon1",
+                    "nyc3",
+                    "ams3"
+                ],
+                "slug": null
+            },
+            "kernel": {
+                "id": 140,
+                "name": "Debian 7.0 x64 vmlinuz-3.2.0-4-amd64  (3.2.41-2) ",
+                "version": "3.2.0-4-amd64"
+            },
+            "locked": false,
+            "memory": 512,
+            "name": "test2",
+            "networks": {
+                "v4": [
+                    {
+                        "gateway": "2.2.2.1",
+                        "ip_address": "2.2.2.2",
+                        "netmask": "255.255.255.0",
+                        "type": "public"
+                    }
+                ],
+                "v6": []
+            },
+            "region": {
+                "available": true,
+                "features": [
+                    "virtio",
+                    "private_networking",
+                    "backups",
+                    "metadata"
+                ],
+                "name": "Amsterdam 2",
+                "sizes": [
+                    "512mb",
+                    "2gb",
+                    "4gb",
+                    "8gb",
+                    "32gb",
+                    "48gb",
+                    "16gb",
+                    "64gb",
+                    "1gb"
+                ],
+                "slug": "ams2"
+            },
+            "size": {
+                "price_hourly": 0.00744,
+                "price_monthly": 5.0,
+                "slug": "512mb",
+                "transfer": 1
+            },
+            "snapshot_ids": [],
+            "status": "active",
+            "vcpus": 1
+        }
+    ],
+    "meta": {
+        "total": 8
+    }
+}
