@@ -43,6 +43,7 @@ class TestClientGet(unittest.TestCase):
         self.cli.get('kura')
         h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
              'Authorization': "Bearer test_token",
+             'Connection': "keep-alive",
              'User-Agent': "Batfish ({0})".format(__version__)}
         th = collections.OrderedDict(sorted(h.items()))
         rh = collections.OrderedDict(sorted(responses.calls[0].request.headers.items()))
@@ -58,7 +59,7 @@ class TestClientGet(unittest.TestCase):
         self.cli.get('kura')
         h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
              'Authorization': "Bearer test_token",
-             'User-Agent': "Kura"}
+             'Connection': "keep-alive", 'User-Agent': "Kura"}
         th = collections.OrderedDict(sorted(h.items()))
         rh = collections.OrderedDict(sorted(responses.calls[0].request.headers.items()))
         self.assertEquals(rh, th)
@@ -73,5 +74,6 @@ class TestClientGet(unittest.TestCase):
         self.cli.get('kura', headers=h)
         h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
              'Authorization': "Bearer test_token2", 'X-Random-Header': "test",
-             'User-Agent': 'Batfish ({0})'.format(__version__)}
+             'User-Agent': 'Batfish ({0})'.format(__version__),
+             'Connection': "keep-alive",}
         self.assertEquals(responses.calls[0].request.headers, h)

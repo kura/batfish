@@ -84,6 +84,7 @@ class Droplet(object):
             >>> droplet = cli.droplet_from_id(1234)
             >>> droplet.memory
             '512MB'
+
         :rtype: `string`.
         """
         return self._data['memory']

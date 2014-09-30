@@ -44,6 +44,7 @@ class TestClientput(unittest.TestCase):
         self.cli.put('kura', self.base_payload)
         h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
              'Authorization': "Bearer test_token",
+             'Connection': "keep-alive",
              'User-Agent': "Batfish ({0})".format(__version__),
              'Content-Length': '2', 'Content-Type': "application/json"}
         th = collections.OrderedDict(sorted(h.items()))

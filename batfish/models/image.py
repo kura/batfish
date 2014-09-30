@@ -25,7 +25,6 @@
 
 from datetime import datetime
 
-from .action import Action
 from .region import Region
 
 

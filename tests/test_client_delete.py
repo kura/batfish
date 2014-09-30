@@ -43,6 +43,7 @@ class TestClientDelete(unittest.TestCase):
         self.cli.delete('kura')
         h = {'Accept': "*/*", 'Accept-Encoding': "gzip, deflate",
              'Authorization': "Bearer test_token",
+             'Connection': "keep-alive",
              'User-Agent': "Batfish ({0})".format(__version__),
              'Content-Length': '0'}
         th = collections.OrderedDict(sorted(h.items()))
